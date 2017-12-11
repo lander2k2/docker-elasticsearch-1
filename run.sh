@@ -38,6 +38,9 @@ if [ ! -z "${SHARD_ALLOCATION_AWARENESS_ATTR}" ]; then
     fi
 fi
 
+# Search Guard
+enable_searchguard.sh
+
 # run
 chown -R elasticsearch:elasticsearch $BASE
 chown -R elasticsearch:elasticsearch /data

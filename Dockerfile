@@ -4,7 +4,8 @@ MAINTAINER pjpires@gmail.com
 # Export HTTP & Transport
 EXPOSE 9200 9300
 
-ENV ES_VERSION 6.0.0
+ENV ES_VERSION 5.5.0
+ENV SG_VERSION "16"
 
 ENV DOWNLOAD_URL "https://artifacts.elastic.co/downloads/elasticsearch"
 ENV ES_TARBAL "${DOWNLOAD_URL}/elasticsearch-${ES_VERSION}.tar.gz"
@@ -12,8 +13,8 @@ ENV ES_TARBALL_ASC "${DOWNLOAD_URL}/elasticsearch-${ES_VERSION}.tar.gz.asc"
 ENV GPG_KEY "46095ACC8548582C1A2699A9D27D666CD88E42B4"
 
 # Install Elasticsearch.
-RUN apk add --no-cache --update bash ca-certificates su-exec util-linux curl
-RUN apk add --no-cache -t .build-deps gnupg openssl \
+RUN apk add --no-cache --update bash ca-certificates su-exec util-linux curl openssl
+RUN apk add --no-cache -t .build-deps gnupg \
   && cd /tmp \
   && echo "===> Install Elasticsearch..." \
   && curl -o elasticsearch.tar.gz -Lskj "$ES_TARBAL"; \
@@ -28,6 +29,8 @@ RUN apk add --no-cache -t .build-deps gnupg openssl \
   && ls -lah \
   && mv elasticsearch-$ES_VERSION /elasticsearch \
   && adduser -DH -s /sbin/nologin elasticsearch \
+  && echo "===> Install Search Guard..." \
+  && /elasticsearch/bin/elasticsearch-plugin install -b "com.floragunn:search-guard-5:$ES_VERSION-$SG_VERSION" \
   && echo "===> Creating Elasticsearch Paths..." \
   && for path in \
   	/elasticsearch/config \
@@ -49,6 +52,9 @@ COPY config /elasticsearch/config
 
 # Copy run script
 COPY run.sh /
+
+# Search Guard
+COPY bin/* /usr/local/bin/
 
 # Set environment variables defaults
 ENV ES_JAVA_OPTS "-Xms512m -Xmx512m"
