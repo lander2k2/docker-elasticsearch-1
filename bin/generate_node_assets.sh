@@ -1,7 +1,7 @@
 #!/bin/bash
 
 touch /elasticsearch/config/tls/nodes/certindex
-echo $((1 + RANDOM % 1000000)) > /elasticsearch/config/tls/nodes/certserial
+echo $((100000 + RANDOM % 999999)) > /elasticsearch/config/tls/nodes/certserial
 
 cat > /elasticsearch/config/tls/nodes/${NODE_NAME}.cnf <<EOS
 [ca]
